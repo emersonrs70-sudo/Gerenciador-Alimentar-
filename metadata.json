@@ -1,0 +1,6 @@
+{
+  "name": "Receitas, Despensa e Cardápio Semanal",
+  "description": "Planejador semanal de refeições, controle inteligente de despensa e busca avançada de receitas com Chef IA.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

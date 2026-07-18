@@ -1,0 +1,45 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Playfair Display", Georgia, serif;
+  --font-display: "Playfair Display", "Inter", sans-serif;
+
+  /* Natural Tones custom color transformations mapping */
+  --color-orange-50: #FDFBF7;
+  --color-orange-100: #DDE2D1;
+  --color-orange-200: #EFECE6;
+  --color-orange-500: #8B9A6D;
+  --color-orange-600: #718153;
+  --color-orange-700: #5A6347;
+
+  --color-purple-50: #EFECE6;
+  --color-purple-100: #E8D4C0;
+  --color-purple-600: #8B9A6D;
+  --color-purple-700: #718153;
+
+  --color-amber-50: #FDFBF7;
+  --color-amber-100: #E8D4C0;
+  --color-amber-500: #D9A066;
+  --color-amber-700: #7A5C3E;
+
+  --color-slate-50: #FDFBF7;
+  --color-slate-100: #EFECE6;
+  --color-slate-200: #F2EEE9;
+  --color-slate-300: #9A9384;
+  --color-slate-400: #9A9384;
+  --color-slate-500: #4A4636;
+  --color-slate-600: #4A4636;
+  --color-slate-700: #2D2A22;
+  --color-slate-800: #2D2A22;
+  --color-slate-900: #2D2A22;
+}
+
+/* Custom global styles to make interactions look incredibly fluid */
+@layer base {
+  body {
+    background-color: #FDFBF7; /* bg-slate-50 / Natural Tones */
+    color: #4A4636; /* text-slate-600 / Natural Tones */
+  }
+}
