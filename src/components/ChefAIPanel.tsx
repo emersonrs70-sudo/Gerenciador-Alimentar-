@@ -80,11 +80,18 @@ export default function ChefAIPanel({ pantry, onRecipeGenerated }: ChefAIPanelPr
         })
       });
 
-      const data = await response.json();
-
       if (!response.ok) {
-        throw new Error(data.error || data.details || 'Falha ao comunicar com o servidor.');
+        let errorDetails = 'Falha ao comunicar com o servidor de IA.';
+        try {
+          const errData = await response.json();
+          errorDetails = errData.error || errData.details || errorDetails;
+        } catch {
+          errorDetails = 'O servidor Node.js/Express não está ativo nesta hospedagem estática (GitHub Pages). As funções locais (catálogo, despensa, cardápio, timers, histórico) funcionam 100%, mas para usar o Chef IA com Gemini é necessário rodar com backend Node.';
+        }
+        throw new Error(errorDetails);
       }
+
+      const data = await response.json();
 
       onRecipeGenerated(data);
     } catch (err: any) {

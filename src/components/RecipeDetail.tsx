@@ -46,8 +46,14 @@ export default function RecipeDetail({
         body: JSON.stringify({ recipe, dietGoal: selectedDietGoal })
       });
       if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Erro ao adaptar receita com IA.');
+        let msg = 'Erro ao comunicar com o servidor de IA.';
+        try {
+          const data = await response.json();
+          msg = data.error || data.details || msg;
+        } catch {
+          msg = 'Backend não disponível neste ambiente estático (o GitHub Pages suporta apenas arquivos estáticos; hospede no Cloud Run, Vercel ou Render para habilitar o servidor Node com Gemini).';
+        }
+        throw new Error(msg);
       }
       const adapted: Recipe = await response.json();
       onRecipeAdapted(adapted);
