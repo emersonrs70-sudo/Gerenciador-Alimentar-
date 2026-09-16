@@ -117,29 +117,29 @@ export default function ShoppingListManager({
   };
 
   return (
-    <div class="space-y-6">
+    <div className="space-y-6">
       
       {/* Overview stats and controls */}
-      <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div class="flex items-center gap-3">
-          <div class="p-3 bg-orange-100 text-orange-600 rounded-xl">
+      <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="p-3 bg-orange-100 text-orange-600 rounded-xl">
             <ShoppingCart size={22} />
           </div>
           <div>
-            <h3 class="text-xl font-serif italic font-bold text-slate-800">
+            <h3 className="text-xl font-serif italic font-bold text-slate-800">
               Sua Lista de Compras ({shoppingList.length})
             </h3>
-            <p class="text-xs text-slate-400 mt-1">
+            <p className="text-xs text-slate-400 mt-1">
               Itens selecionados das receitas, do estoque da despensa, ou adicionados manualmente por você.
             </p>
           </div>
         </div>
 
-        <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+        <div className="flex flex-wrap gap-2 w-full sm:w-auto">
           <button
             onClick={handleShareList}
             disabled={shoppingList.length === 0}
-            class="flex-1 sm:flex-initial text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-2 px-3 rounded-xl transition-all flex items-center justify-center gap-1.5 border border-slate-200 cursor-pointer disabled:opacity-50"
+            className="flex-1 sm:flex-initial text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-2 px-3 rounded-xl transition-all flex items-center justify-center gap-1.5 border border-slate-200 cursor-pointer disabled:opacity-50"
           >
             <Share2 size={14} />
             <span>Copiar para Compartilhar</span>
@@ -148,7 +148,7 @@ export default function ShoppingListManager({
           {shoppingList.some(i => i.checked) && (
             <button
               onClick={handleClearChecked}
-              class="flex-1 sm:flex-initial text-xs bg-amber-50 hover:bg-amber-100 text-amber-700 font-medium py-2 px-3 rounded-xl transition-all flex items-center justify-center gap-1.5 border border-amber-200 cursor-pointer"
+              className="flex-1 sm:flex-initial text-xs bg-amber-50 hover:bg-amber-100 text-amber-700 font-medium py-2 px-3 rounded-xl transition-all flex items-center justify-center gap-1.5 border border-amber-200 cursor-pointer"
             >
               <Trash2 size={14} />
               <span>Limpar Comprados</span>
@@ -158,7 +158,7 @@ export default function ShoppingListManager({
           <button
             onClick={handleClearAll}
             disabled={shoppingList.length === 0}
-            class="flex-1 sm:flex-initial text-xs bg-rose-50 hover:bg-rose-100 text-rose-700 font-medium py-2 px-3 rounded-xl transition-all flex items-center justify-center gap-1.5 border border-rose-200 cursor-pointer disabled:opacity-50"
+            className="flex-1 sm:flex-initial text-xs bg-rose-50 hover:bg-rose-100 text-rose-700 font-medium py-2 px-3 rounded-xl transition-all flex items-center justify-center gap-1.5 border border-rose-200 cursor-pointer disabled:opacity-50"
           >
             <Trash2 size={14} />
             <span>Limpar Tudo</span>
@@ -166,31 +166,31 @@ export default function ShoppingListManager({
         </div>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         {/* Item Adder Form (1/3 of space) */}
-        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm h-fit">
-          <h3 class="text-lg font-display font-semibold text-slate-800 mb-4 flex items-center gap-2">
-            <Plus size={18} class="text-orange-500" />
+        <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm h-fit">
+          <h3 className="text-lg font-display font-semibold text-slate-800 mb-4 flex items-center gap-2">
+            <Plus size={18} className="text-orange-500" />
             Adicionar Item Avulso
           </h3>
 
-          <form onSubmit={handleAddItem} class="space-y-4">
+          <form onSubmit={handleAddItem} className="space-y-4">
             <div>
-              <label class="block text-xs font-medium text-slate-500 mb-1">Nome do Item</label>
+              <label className="block text-xs font-medium text-slate-500 mb-1">Nome do Item</label>
               <input
                 type="text"
                 required
                 placeholder="Ex: Leite condensado, Detergente..."
                 value={newItemName}
                 onChange={e => setNewItemName(e.target.value)}
-                class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all font-medium"
+                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all font-medium"
               />
             </div>
 
-            <div class="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               <div>
-                <label class="block text-xs font-medium text-slate-500 mb-1">Quantidade</label>
+                <label className="block text-xs font-medium text-slate-500 mb-1">Quantidade</label>
                 <input
                   type="number"
                   required
@@ -198,15 +198,15 @@ export default function ShoppingListManager({
                   step="any"
                   value={newItemAmount}
                   onChange={e => setNewItemAmount(Number(e.target.value))}
-                  class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all font-medium"
+                  className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all font-medium"
                 />
               </div>
               <div>
-                <label class="block text-xs font-medium text-slate-500 mb-1">Unidade</label>
+                <label className="block text-xs font-medium text-slate-500 mb-1">Unidade</label>
                 <select
                   value={newItemUnit}
                   onChange={e => setNewItemUnit(e.target.value)}
-                  class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all font-medium"
+                  className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all font-medium"
                 >
                   <option value="unidade">unidade</option>
                   <option value="g">g (gramas)</option>
@@ -220,11 +220,11 @@ export default function ShoppingListManager({
             </div>
 
             <div>
-              <label class="block text-xs font-medium text-slate-500 mb-1">Seção / Categoria</label>
+              <label className="block text-xs font-medium text-slate-500 mb-1">Seção / Categoria</label>
               <select
                 value={newItemCategory}
                 onChange={e => setNewItemCategory(e.target.value)}
-                class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all font-medium"
+                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all font-medium"
               >
                 {PANTRY_CATEGORIES.map(cat => (
                   <option key={cat} value={cat}>{cat}</option>
@@ -234,7 +234,7 @@ export default function ShoppingListManager({
 
             <button
               type="submit"
-              class="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-2.5 rounded-xl transition-colors text-sm shadow shadow-orange-500/10 flex items-center justify-center gap-1.5"
+              className="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-2.5 rounded-xl transition-colors text-sm shadow shadow-orange-500/10 flex items-center justify-center gap-1.5"
             >
               <Plus size={16} />
               <span>Adicionar à Lista</span>
@@ -243,60 +243,60 @@ export default function ShoppingListManager({
         </div>
 
         {/* Dynamic Category Lists (2/3 of space) */}
-        <div class="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+        <div className="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
           {shoppingList.length === 0 ? (
-            <div class="text-center py-16 text-slate-400 space-y-3">
-              <ShoppingCart size={48} class="mx-auto text-slate-300 stroke-1" />
+            <div className="text-center py-16 text-slate-400 space-y-3">
+              <ShoppingCart size={48} className="mx-auto text-slate-300 stroke-1" />
               <div>
-                <p class="text-sm font-medium">Sua lista de compras está vazia!</p>
-                <p class="text-xs text-slate-400 mt-1">Adicione itens na caixa ao lado ou a partir das receitas.</p>
+                <p className="text-sm font-medium">Sua lista de compras está vazia!</p>
+                <p className="text-xs text-slate-400 mt-1">Adicione itens na caixa ao lado ou a partir das receitas.</p>
               </div>
             </div>
           ) : (
-            <div class="space-y-6">
+            <div className="space-y-6">
               {(Object.entries(groupedItems) as [string, ShoppingListItem[]][]).map(([category, items]) => (
-                <div key={category} class="space-y-2">
-                  <h4 class="text-xs font-bold font-display uppercase tracking-wider text-slate-400 pb-1 border-b border-slate-100">
+                <div key={category} className="space-y-2">
+                  <h4 className="text-xs font-bold font-display uppercase tracking-wider text-slate-400 pb-1 border-b border-slate-100">
                     {category}
                   </h4>
 
-                  <div class="divide-y divide-slate-100/60">
+                  <div className="divide-y divide-slate-100/60">
                     {items.map(item => (
                       <div
                         key={item.id}
                         onClick={() => handleToggleCheck(item.id)}
-                        class={`flex items-center justify-between py-2.5 px-1 hover:bg-slate-50/50 rounded-xl cursor-pointer transition-all ${
+                        className={`flex items-center justify-between py-2.5 px-1 hover:bg-slate-50/50 rounded-xl cursor-pointer transition-all ${
                           item.checked ? 'opacity-55' : ''
                         }`}
                       >
-                        <div class="flex items-center gap-3">
+                        <div className="flex items-center gap-3">
                           <button
-                            class={`transition-colors ${
+                            className={`transition-colors ${
                               item.checked ? 'text-emerald-500' : 'text-slate-300'
                             }`}
                           >
                             {item.checked ? (
-                              <CheckSquare size={18} class="fill-emerald-50" />
+                              <CheckSquare size={18} className="fill-emerald-50" />
                             ) : (
                               <Square size={18} />
                             )}
                           </button>
 
                           <div>
-                            <span class={`text-sm font-medium ${item.checked ? 'line-through text-slate-400' : 'text-slate-800'}`}>
+                            <span className={`text-sm font-medium ${item.checked ? 'line-through text-slate-400' : 'text-slate-800'}`}>
                               {item.name}
                             </span>
                             
                             {item.recipeTitle && (
-                              <span class="block text-[10px] text-orange-600 bg-orange-50 font-medium px-1.5 py-0.5 rounded-md mt-0.5 w-fit">
+                              <span className="block text-[10px] text-orange-600 bg-orange-50 font-medium px-1.5 py-0.5 rounded-md mt-0.5 w-fit">
                                 {item.recipeTitle}
                               </span>
                             )}
                           </div>
                         </div>
 
-                        <div class="flex items-center gap-4">
-                          <span class="text-xs font-mono font-bold text-slate-600">
+                        <div className="flex items-center gap-4">
+                          <span className="text-xs font-mono font-bold text-slate-600">
                             {item.amount} {item.unit}
                           </span>
 
@@ -305,7 +305,7 @@ export default function ShoppingListManager({
                               e.stopPropagation();
                               handleDeleteItem(item.id);
                             }}
-                            class="text-slate-300 hover:text-rose-500 p-1.5 rounded-lg transition-all"
+                            className="text-slate-300 hover:text-rose-500 p-1.5 rounded-lg transition-all"
                             title="Remover"
                           >
                             <Trash2 size={14} />

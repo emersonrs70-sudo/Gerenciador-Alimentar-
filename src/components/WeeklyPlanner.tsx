@@ -86,25 +86,25 @@ export default function WeeklyPlanner({
   };
 
   return (
-    <div class="space-y-8">
+    <div className="space-y-8">
       
       {/* Top Banner Controls */}
-      <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
+      <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
         <div>
-          <h3 class="text-xl font-serif italic font-bold text-slate-800 flex items-center gap-2">
-            <Calendar size={22} class="text-orange-500" />
+          <h3 className="text-xl font-serif italic font-bold text-slate-800 flex items-center gap-2">
+            <Calendar size={22} className="text-orange-500" />
             <span>Cronograma Semanal da Família</span>
           </h3>
-          <p class="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-slate-400 mt-1">
             Organize os pratos de toda a semana para evitar desperdício de alimentos e planejar as compras com antecedência.
           </p>
         </div>
 
-        <div class="flex flex-wrap gap-2 w-full md:w-auto">
+        <div className="flex flex-wrap gap-2 w-full md:w-auto">
           <button
             onClick={handleGenerateShoppingFromPlan}
             disabled={weeklyPlan.length === 0}
-            class="flex-1 md:flex-initial text-xs bg-orange-500 hover:bg-orange-600 disabled:bg-slate-200 text-white font-medium py-2 px-3 rounded-xl transition-all flex items-center justify-center gap-1.5 shadow shadow-orange-500/10 cursor-pointer disabled:cursor-not-allowed"
+            className="flex-1 md:flex-initial text-xs bg-orange-500 hover:bg-orange-600 disabled:bg-slate-200 text-white font-medium py-2 px-3 rounded-xl transition-all flex items-center justify-center gap-1.5 shadow shadow-orange-500/10 cursor-pointer disabled:cursor-not-allowed"
           >
             <ClipboardList size={14} />
             <span>Abastecer Lista com Menu</span>
@@ -113,7 +113,7 @@ export default function WeeklyPlanner({
           <button
             onClick={handleClearAll}
             disabled={weeklyPlan.length === 0}
-            class="flex-1 md:flex-initial text-xs bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 border border-slate-200 hover:border-rose-200 font-medium py-2 px-3 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+            className="flex-1 md:flex-initial text-xs bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 border border-slate-200 hover:border-rose-200 font-medium py-2 px-3 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
           >
             <Trash2 size={14} />
             <span>Limpar Cronograma</span>
@@ -121,22 +121,22 @@ export default function WeeklyPlanner({
         </div>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         
         {/* Scheduler Form panel (1/4 space) */}
-        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-5 h-fit">
-          <h4 class="text-md font-display font-semibold text-slate-800 flex items-center gap-1.5">
-            <ChefHat size={18} class="text-orange-500" />
+        <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-5 h-fit">
+          <h4 className="text-md font-display font-semibold text-slate-800 flex items-center gap-1.5">
+            <ChefHat size={18} className="text-orange-500" />
             Agendar Refeição
           </h4>
 
-          <form onSubmit={handleSchedule} class="space-y-4">
+          <form onSubmit={handleSchedule} className="space-y-4">
             <div>
-              <label class="block text-xs font-medium text-slate-500 mb-1">Dia da Semana</label>
+              <label className="block text-xs font-medium text-slate-500 mb-1">Dia da Semana</label>
               <select
                 value={selectedDay}
                 onChange={e => setSelectedDay(e.target.value as DayOfWeek)}
-                class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all font-medium"
+                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all font-medium"
               >
                 {DAYS.map(d => (
                   <option key={d} value={d}>{d}</option>
@@ -145,11 +145,11 @@ export default function WeeklyPlanner({
             </div>
 
             <div>
-              <label class="block text-xs font-medium text-slate-500 mb-1">Momento da Refeição</label>
+              <label className="block text-xs font-medium text-slate-500 mb-1">Momento da Refeição</label>
               <select
                 value={selectedMeal}
                 onChange={e => setSelectedMeal(e.target.value as MealTime)}
-                class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all font-medium"
+                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all font-medium"
               >
                 {MEALS.map(m => (
                   <option key={m} value={m}>{m}</option>
@@ -158,12 +158,12 @@ export default function WeeklyPlanner({
             </div>
 
             <div>
-              <label class="block text-xs font-medium text-slate-500 mb-1">Escolher Receita</label>
+              <label className="block text-xs font-medium text-slate-500 mb-1">Escolher Receita</label>
               <select
                 required
                 value={selectedRecipeId}
                 onChange={e => setSelectedRecipeId(e.target.value)}
-                class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all text-slate-700 font-medium"
+                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all text-slate-700 font-medium"
               >
                 <option value="">Selecione uma receita...</option>
                 {recipes.map(r => (
@@ -177,7 +177,7 @@ export default function WeeklyPlanner({
             <button
               type="submit"
               disabled={!selectedRecipeId}
-              class="w-full bg-slate-950 hover:bg-slate-900 disabled:bg-slate-100 text-white disabled:text-slate-400 font-medium py-2 px-4 rounded-xl transition-colors text-xs flex items-center justify-center gap-1.5 cursor-pointer"
+              className="w-full bg-slate-950 hover:bg-slate-900 disabled:bg-slate-100 text-white disabled:text-slate-400 font-medium py-2 px-4 rounded-xl transition-colors text-xs flex items-center justify-center gap-1.5 cursor-pointer"
             >
               <Plus size={14} />
               <span>Agendar no Cardápio</span>
@@ -186,26 +186,26 @@ export default function WeeklyPlanner({
         </div>
 
         {/* Weekly Calendar Schedule Board (3/4 space) */}
-        <div class="lg:col-span-3 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm overflow-x-auto">
-          <div class="min-w-[700px]">
+        <div className="lg:col-span-3 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm overflow-x-auto">
+          <div className="min-w-[700px]">
             {/* Header row */}
-            <div class="grid grid-cols-8 border-b border-slate-100 pb-3 mb-4 text-center">
-              <div class="text-left font-display font-semibold text-slate-400 text-xs uppercase tracking-wider">
+            <div className="grid grid-cols-8 border-b border-slate-100 pb-3 mb-4 text-center">
+              <div className="text-left font-display font-semibold text-slate-400 text-xs uppercase tracking-wider">
                 Refeição
               </div>
               {DAYS.map(day => (
-                <div key={day} class="font-display font-semibold text-slate-700 text-xs uppercase tracking-wider">
+                <div key={day} className="font-display font-semibold text-slate-700 text-xs uppercase tracking-wider">
                   {day.slice(0, 3)}
                 </div>
               ))}
             </div>
 
             {/* Meal rows */}
-            <div class="space-y-4">
+            <div className="space-y-4">
               {MEALS.map(meal => (
-                <div key={meal} class="grid grid-cols-8 items-center gap-2">
+                <div key={meal} className="grid grid-cols-8 items-center gap-2">
                   {/* Left row header */}
-                  <div class="text-left py-2 font-display font-semibold text-slate-800 text-xs sm:text-sm">
+                  <div className="text-left py-2 font-display font-semibold text-slate-800 text-xs sm:text-sm">
                     {meal}
                   </div>
 
@@ -217,7 +217,7 @@ export default function WeeklyPlanner({
                     return (
                       <div
                         key={day}
-                        class={`h-24 rounded-xl p-2.5 border transition-all flex flex-col justify-between ${
+                        className={`h-24 rounded-xl p-2.5 border transition-all flex flex-col justify-between ${
                           recipe
                             ? 'bg-orange-50/40 border-orange-200/60 shadow-xs'
                             : 'bg-slate-50/50 border-slate-100 border-dashed hover:bg-slate-50/80 cursor-pointer'
@@ -231,18 +231,18 @@ export default function WeeklyPlanner({
                       >
                         {recipe ? (
                           <>
-                            <div class="space-y-1">
+                            <div className="space-y-1">
                               <h5
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   onSelectRecipe(recipe);
                                 }}
-                                class="font-semibold text-[11px] text-slate-800 leading-tight hover:text-orange-600 hover:underline cursor-pointer line-clamp-2"
+                                className="font-semibold text-[11px] text-slate-800 leading-tight hover:text-orange-600 hover:underline cursor-pointer line-clamp-2"
                                 title={recipe.title}
                               >
                                 {recipe.title}
                               </h5>
-                              <span class="text-[9px] uppercase tracking-wider text-orange-600 font-bold block">
+                              <span className="text-[9px] uppercase tracking-wider text-orange-600 font-bold block">
                                 {recipe.diet}
                               </span>
                             </div>
@@ -252,16 +252,16 @@ export default function WeeklyPlanner({
                                 e.stopPropagation();
                                 handleRemovePlanItem(scheduled!.id);
                               }}
-                              class="text-slate-400 hover:text-rose-600 p-0.5 rounded transition-all self-end"
+                              className="text-slate-400 hover:text-rose-600 p-0.5 rounded transition-all self-end"
                               title="Remover refeição"
                             >
                               <Trash2 size={12} />
                             </button>
                           </>
                         ) : (
-                          <div class="flex flex-col items-center justify-center h-full text-slate-300 group hover:text-orange-400">
-                            <Plus size={16} class="stroke-1.5 transition-colors" />
-                            <span class="text-[9px] font-medium mt-1">Adicionar</span>
+                          <div className="flex flex-col items-center justify-center h-full text-slate-300 group hover:text-orange-400">
+                            <Plus size={16} className="stroke-1.5 transition-colors" />
+                            <span className="text-[9px] font-medium mt-1">Adicionar</span>
                           </div>
                         )}
                       </div>

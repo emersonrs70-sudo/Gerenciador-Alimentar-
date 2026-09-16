@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Recipe, PantryItem, WeeklyPlan, ShoppingListItem, RecipeDiet, RecipeDifficulty, RecipeCategory } from './types';
+import { Recipe, PantryItem, WeeklyPlan, ShoppingListItem, RecipeDiet, RecipeDifficulty, RecipeCategory, CookingHistoryEntry } from './types';
 import { INITIAL_RECIPES, INITIAL_PANTRY } from './data';
 import { getRecipeMatchScore } from './utils';
 
@@ -9,6 +9,9 @@ import PantryManager from './components/PantryManager';
 import WeeklyPlanner from './components/WeeklyPlanner';
 import ShoppingListManager from './components/ShoppingListManager';
 import ChefAIPanel from './components/ChefAIPanel';
+import ActiveCookingWalkthrough from './components/ActiveCookingWalkthrough';
+import ManualRecipeForm from './components/ManualRecipeForm';
+import CookingHistoryDashboard from './components/CookingHistoryDashboard';
 
 // Icons
 import {
@@ -25,12 +28,17 @@ import {
   Plus,
   BookOpen,
   Utensils,
-  Maximize2
+  Maximize2,
+  Award,
+  History,
+  TrendingUp,
+  ClipboardList,
+  Edit3
 } from 'lucide-react';
 
 export default function App() {
   // Navigation space tab
-  const [activeTab, setActiveTab] = useState<'recipes' | 'pantry' | 'planning' | 'shopping' | 'chef-ai'>('recipes');
+  const [activeTab, setActiveTab] = useState<'recipes' | 'pantry' | 'planning' | 'shopping' | 'chef-ai' | 'history'>('recipes');
 
   // Core App states with LocalStorage persistence
   const [recipes, setRecipes] = useState<Recipe[]>(() => {
@@ -58,6 +66,20 @@ export default function App() {
     return saved ? JSON.parse(saved) : [];
   });
 
+  // Cooking History State
+  const [cookingHistory, setCookingHistory] = useState<CookingHistoryEntry[]>(() => {
+    const saved = localStorage.getItem('receitas_history');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  // Active cooking step-by-step state
+  const [activeCookingRecipe, setActiveCookingRecipe] = useState<Recipe | null>(null);
+  const [cookingServings, setCookingServings] = useState<number>(4);
+
+  // Manual Custom Recipe modal state
+  const [showManualRecipeForm, setShowManualRecipeForm] = useState(false);
+  const [editingRecipe, setEditingRecipe] = useState<Recipe | undefined>(undefined);
+
   // Selected recipe for detail modal / view
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
 
@@ -67,6 +89,10 @@ export default function App() {
   const [difficultyFilter, setDifficultyFilter] = useState<RecipeDifficulty | 'Todos'>('Todos');
   const [categoryFilter, setCategoryFilter] = useState<RecipeCategory | 'Todos'>('Todos');
   const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
+
+  // States for searching and generating new recipes via Gemini AI
+  const [isSearchingAI, setIsSearchingAI] = useState(false);
+  const [searchAIError, setSearchAIError] = useState<string | null>(null);
 
   // Persist states to LocalStorage on changes
   useEffect(() => {
@@ -89,6 +115,10 @@ export default function App() {
     localStorage.setItem('receitas_favorites', JSON.stringify(favorites));
   }, [favorites]);
 
+  useEffect(() => {
+    localStorage.setItem('receitas_history', JSON.stringify(cookingHistory));
+  }, [cookingHistory]);
+
   // Toggle favorite recipe state
   const handleToggleFavorite = (recipeId: string) => {
     setFavorites(prev => {
@@ -110,11 +140,144 @@ export default function App() {
     setShoppingList(prev => [...prev, newItem]);
   };
 
+  // Handle active step-by-step cooking completion with stock deduction & stats tracking
+  const handleFinishCooking = (deductPantry: boolean) => {
+    if (!activeCookingRecipe) return;
+
+    const recipe = activeCookingRecipe;
+    const servings = cookingServings;
+    const factor = servings / (recipe.servings || 4);
+    const lowStockAlertItems: string[] = [];
+
+    if (deductPantry) {
+      setPantry(currentPantry => {
+        const updatedPantry = currentPantry.map(item => {
+          // Find if this pantry item matches an ingredient required in the recipe
+          const matchingIngredient = recipe.ingredients.find(ing => 
+            ing.name.toLowerCase().trim() === item.name.toLowerCase().trim() ||
+            item.name.toLowerCase().trim().includes(ing.name.toLowerCase().trim()) ||
+            ing.name.toLowerCase().trim().includes(item.name.toLowerCase().trim())
+          );
+
+          if (matchingIngredient) {
+            const requiredQty = matchingIngredient.amount * factor;
+            const newQty = Math.max(0, Math.round((item.quantity - requiredQty) * 10) / 10);
+            
+            if (newQty <= item.minQuantity && item.quantity > item.minQuantity) {
+              lowStockAlertItems.push(item.name);
+            }
+            return { ...item, quantity: newQty };
+          }
+          return item;
+        });
+        return updatedPantry;
+      });
+    }
+
+    // Add to cooking history
+    const newHistoryEntry: CookingHistoryEntry = {
+      id: `cooked-${Date.now()}`,
+      recipeId: recipe.id,
+      recipeTitle: recipe.title,
+      recipeImage: recipe.image,
+      cookedAt: new Date().toISOString(),
+      servings,
+      calories: recipe.calories || 240,
+      difficulty: recipe.difficulty,
+      diet: recipe.diet
+    };
+
+    setCookingHistory(prev => [newHistoryEntry, ...prev]);
+    setActiveCookingRecipe(null);
+    setSelectedRecipe(null);
+
+    // Show a helpful stock deduction summary alert
+    setTimeout(() => {
+      if (lowStockAlertItems.length > 0) {
+        const confirmAdd = window.confirm(
+          `🍳 Receita concluída com sucesso e salva no Histórico!\n\nAtenção: os seguintes itens da sua despensa ficaram com estoque baixo ou esgotaram: ${lowStockAlertItems.join(', ')}.\n\nDeseja adicioná-los automaticamente à sua lista de compras?`
+        );
+        if (confirmAdd) {
+          lowStockAlertItems.forEach(name => {
+            const pantryItem = pantry.find(p => p.name.toLowerCase() === name.toLowerCase());
+            handleAddShoppingListItem({
+              name,
+              amount: pantryItem ? pantryItem.minQuantity * 2 : 1,
+              unit: pantryItem ? pantryItem.unit : 'unidade',
+              category: pantryItem ? pantryItem.category : 'Despensa',
+              recipeTitle: recipe.title
+            });
+          });
+          alert('Itens adicionados à lista de compras!');
+        }
+      } else {
+        alert('🎉 Parabéns! Receita concluída e salva no histórico com sucesso!');
+      }
+    }, 400);
+  };
+
+  // Add / Edit manual custom recipe
+  const handleSaveManualRecipe = (savedRecipe: Recipe) => {
+    setRecipes(prev => {
+      const exists = prev.some(r => r.id === savedRecipe.id);
+      if (exists) {
+        return prev.map(r => r.id === savedRecipe.id ? savedRecipe : r);
+      } else {
+        return [savedRecipe, ...prev];
+      }
+    });
+    setShowManualRecipeForm(false);
+    setEditingRecipe(undefined);
+    if (selectedRecipe && selectedRecipe.id === savedRecipe.id) {
+      setSelectedRecipe(savedRecipe);
+    }
+  };
+
+  // Permanent custom recipe deleting
+  const handleDeleteRecipe = (recipeId: string) => {
+    setRecipes(prev => prev.filter(r => r.id !== recipeId));
+    setFavorites(prev => prev.filter(id => id !== recipeId));
+    setSelectedRecipe(null);
+  };
+
+  // AI adaptation recipe receiver
+  const handleRecipeAdapted = (adaptedRecipe: Recipe) => {
+    setRecipes(prev => [adaptedRecipe, ...prev]);
+    setSelectedRecipe(adaptedRecipe);
+  };
+
   // Handle recipe generated by Chef AI
   const handleRecipeGenerated = (newRecipe: Recipe) => {
     setRecipes(prev => [newRecipe, ...prev]);
     setSelectedRecipe(newRecipe);
     setActiveTab('recipes'); // switch back to library to view it
+  };
+
+  // Call API to search and generate a recipe by name/query
+  const handleAISearchGenerate = async (queryText: string) => {
+    if (!queryText || queryText.trim().length === 0) return;
+    setIsSearchingAI(true);
+    setSearchAIError(null);
+    try {
+      const response = await fetch('/api/search-new-recipe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: queryText }),
+      });
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.error || 'Erro ao gerar receita via IA.');
+      }
+      const newRecipe: Recipe = await response.json();
+      setRecipes(prev => [newRecipe, ...prev]);
+      setSelectedRecipe(newRecipe);
+      setSearchQuery(''); // clear search query on success
+    } catch (error: any) {
+      console.error(error);
+      setSearchAIError(error.message || 'Erro de conexão com o servidor.');
+    } finally {
+      setIsSearchingAI(false);
+    }
   };
 
   // Filter recipes based on query, diet, difficulty, category, and favorites toggles
@@ -238,6 +401,17 @@ export default function App() {
               </button>
 
               <button
+                onClick={() => { setSelectedRecipe(null); setActiveTab('history'); }}
+                className={`pb-1 transition-all cursor-pointer ${
+                  activeTab === 'history'
+                    ? 'text-orange-500 border-b-2 border-orange-500 font-bold'
+                    : 'text-slate-400 hover:text-slate-800'
+                }`}
+              >
+                <span>Histórico</span>
+              </button>
+
+              <button
                 onClick={() => { setSelectedRecipe(null); setActiveTab('chef-ai'); }}
                 className={`pb-1 transition-all cursor-pointer ${
                   activeTab === 'chef-ai'
@@ -250,7 +424,16 @@ export default function App() {
             </nav>
 
             {/* Basic Mobile layout indicators */}
-            <div className="flex lg:hidden items-center gap-1">
+            <div className="flex lg:hidden items-center gap-2">
+              <button
+                onClick={() => { setSelectedRecipe(null); setActiveTab('history'); }}
+                className={`p-2 rounded-xl transition-all ${
+                  activeTab === 'history' ? 'bg-slate-100 text-slate-800' : 'text-slate-500'
+                }`}
+                title="Histórico"
+              >
+                <History size={18} />
+              </button>
               <button
                 onClick={() => { setSelectedRecipe(null); setActiveTab('chef-ai'); }}
                 className={`p-2 rounded-xl transition-all ${
@@ -278,6 +461,16 @@ export default function App() {
             onToggleFavorite={() => handleToggleFavorite(selectedRecipe.id)}
             onAddToShoppingList={handleAddShoppingListItem}
             onClose={() => setSelectedRecipe(null)}
+            onStartCooking={(recipe, servings) => {
+              setActiveCookingRecipe(recipe);
+              setCookingServings(servings);
+            }}
+            onRecipeAdapted={handleRecipeAdapted}
+            onDeleteRecipe={handleDeleteRecipe}
+            onEditRecipe={(recipe) => {
+              setEditingRecipe(recipe);
+              setShowManualRecipeForm(true);
+            }}
           />
         ) : (
           <>
@@ -307,6 +500,33 @@ export default function App() {
                       </button>
                     )}
                   </div>
+
+                  {/* Search query suggestion / AI generation prompt */}
+                  {searchQuery.trim().length >= 2 && !isSearchingAI && (
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 bg-orange-50/50 rounded-xl border border-orange-100/60 gap-3 animate-fade-in">
+                      <div className="flex items-center gap-2 text-xs text-slate-600">
+                        <Sparkles size={14} className="text-orange-500 shrink-0" />
+                        <span>Quer uma receita nova e específica para <strong>"{searchQuery}"</strong>?</span>
+                      </div>
+                      <button
+                        onClick={() => handleAISearchGenerate(searchQuery)}
+                        className="px-3.5 py-1.5 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all shadow-sm shadow-orange-500/10 cursor-pointer self-start sm:self-center shrink-0"
+                      >
+                        <ChefHat size={13} />
+                        <span>Gerar com Chef IA ✦</span>
+                      </button>
+                    </div>
+                  )}
+
+                  {/* AI Search Errors */}
+                  {searchAIError && (
+                    <div className="p-3 bg-rose-50 text-rose-700 rounded-xl border border-rose-100 text-xs flex justify-between items-center animate-fade-in">
+                      <span>{searchAIError}</span>
+                      <button onClick={() => setSearchAIError(null)} className="text-rose-500 hover:text-rose-700 cursor-pointer p-1">
+                        <X size={14} />
+                      </button>
+                    </div>
+                  )}
 
                   {/* Filter chips container */}
                   <div className="flex flex-wrap gap-4 items-center justify-between pt-1">
@@ -368,38 +588,96 @@ export default function App() {
 
                     </div>
 
-                    {/* Favorites Toggle */}
-                    <button
-                      onClick={() => setShowOnlyFavorites(!showOnlyFavorites)}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 border transition-all ${
-                        showOnlyFavorites
-                          ? 'border-rose-200 bg-rose-50 text-rose-700'
-                          : 'border-slate-200 hover:border-slate-300 text-slate-600'
-                      }`}
-                    >
-                      <Heart size={14} fill={showOnlyFavorites ? '#e11d48' : 'none'} className={showOnlyFavorites ? 'text-rose-600' : 'text-slate-400'} />
-                      <span>Favoritos</span>
-                    </button>
+                    {/* Action buttons */}
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        onClick={() => {
+                          setEditingRecipe(undefined);
+                          setShowManualRecipeForm(true);
+                        }}
+                        className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white flex items-center gap-1.5 shadow-sm shadow-orange-500/10 cursor-pointer"
+                      >
+                        <Plus size={14} />
+                        <span>Nova Receita</span>
+                      </button>
+
+                      <button
+                        onClick={() => setShowOnlyFavorites(!showOnlyFavorites)}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 border transition-all ${
+                          showOnlyFavorites
+                            ? 'border-rose-200 bg-rose-50 text-rose-700'
+                            : 'border-slate-200 hover:border-slate-300 text-slate-600'
+                        }`}
+                      >
+                        <Heart size={14} fill={showOnlyFavorites ? '#e11d48' : 'none'} className={showOnlyFavorites ? 'text-rose-600' : 'text-slate-400'} />
+                        <span>Favoritos</span>
+                      </button>
+                    </div>
                   </div>
 
                 </div>
 
                 {/* Recipe grid list with stock percentages */}
-                {recipesWithStockInfo.length === 0 ? (
-                  <div className="text-center py-20 bg-white rounded-2xl border border-slate-100">
-                    <p className="text-slate-500 font-medium">Nenhuma receita encontrada com os filtros selecionados.</p>
-                    <button
-                      onClick={() => {
-                        setSearchQuery('');
-                        setDietFilter('Todos');
-                        setDifficultyFilter('Todos');
-                        setCategoryFilter('Todos');
-                        setShowOnlyFavorites(false);
-                      }}
-                      className="text-xs text-orange-500 hover:underline mt-2 font-semibold"
-                    >
-                      Redefinir filtros de busca
-                    </button>
+                {isSearchingAI ? (
+                  <div className="bg-white p-12 rounded-3xl border border-slate-100 shadow-sm text-center max-w-xl mx-auto space-y-6 animate-fade-in my-8">
+                    <div className="relative w-20 h-20 mx-auto">
+                      <div className="absolute inset-0 rounded-full border-4 border-orange-100 animate-pulse"></div>
+                      <div className="absolute inset-0 rounded-full border-4 border-t-orange-500 animate-spin"></div>
+                      <div className="absolute inset-0 flex items-center justify-center text-orange-500">
+                        <Sparkles size={28} className="animate-pulse" />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <h4 className="font-serif italic font-bold text-slate-800 text-xl">
+                        O Chef IA está criando sua nova receita...
+                      </h4>
+                      <p className="text-sm text-slate-400 font-light max-w-sm mx-auto">
+                        Buscando os melhores ingredientes, definindo tempos exatos de cozimento e estruturando o passo a passo para "{searchQuery || 'seu prato desejado'}".
+                      </p>
+                    </div>
+                  </div>
+                ) : recipesWithStockInfo.length === 0 ? (
+                  <div className="text-center py-16 bg-white rounded-2xl border border-slate-100 max-w-2xl mx-auto p-8 space-y-6 my-4">
+                    <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto text-slate-400">
+                      <Search size={20} />
+                    </div>
+                    <div className="space-y-1.5">
+                      <p className="text-slate-700 font-serif italic font-bold text-lg">
+                        Nenhuma receita encontrada localmente para "{searchQuery || 'os filtros selecionados'}".
+                      </p>
+                      {searchQuery ? (
+                        <p className="text-slate-400 text-sm max-w-md mx-auto">
+                          Mas não se preocupe! O Chef IA pode criar uma receita incrível e sob medida de "{searchQuery}" para você agora mesmo.
+                        </p>
+                      ) : (
+                        <p className="text-slate-400 text-sm max-w-md mx-auto">
+                          Tente redefinir os filtros de busca para ver todas as receitas disponíveis.
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
+                      {searchQuery && (
+                        <button
+                          onClick={() => handleAISearchGenerate(searchQuery)}
+                          className="px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all shadow-md shadow-orange-500/10 cursor-pointer"
+                        >
+                          <Sparkles size={16} />
+                          <span>Criar Receita de "{searchQuery}" com IA ✦</span>
+                        </button>
+                      )}
+                      <button
+                        onClick={() => {
+                          setSearchQuery('');
+                          setDietFilter('Todos');
+                          setDifficultyFilter('Todos');
+                          setCategoryFilter('Todos');
+                          setShowOnlyFavorites(false);
+                        }}
+                        className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-semibold transition-all cursor-pointer"
+                      >
+                        Limpar filtros de busca
+                      </button>
+                    </div>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -539,6 +817,15 @@ export default function App() {
                 onRecipeGenerated={handleRecipeGenerated}
               />
             )}
+
+            {/* 6. Cooking History & Nutritional Dashboard space */}
+            {activeTab === 'history' && (
+              <CookingHistoryDashboard
+                history={cookingHistory}
+                onClearHistory={() => setCookingHistory([])}
+                onRemoveEntry={(id) => setCookingHistory(prev => prev.filter(e => e.id !== id))}
+              />
+            )}
           </>
         )}
 
@@ -590,7 +877,37 @@ export default function App() {
             <span className="absolute top-0 right-2 w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
           )}
         </button>
+
+        <button
+          onClick={() => { setSelectedRecipe(null); setActiveTab('history'); }}
+          className={`flex flex-col items-center gap-0.5 relative ${activeTab === 'history' ? 'text-orange-500' : 'text-slate-400'}`}
+        >
+          <History size={18} />
+          <span className="text-[9px] font-medium font-sans">Histórico</span>
+        </button>
       </div>
+
+      {/* Modal Overlays for Manual Custom Recipe Form */}
+      {showManualRecipeForm && (
+        <ManualRecipeForm
+          initialRecipe={editingRecipe}
+          onSave={handleSaveManualRecipe}
+          onClose={() => {
+            setShowManualRecipeForm(false);
+            setEditingRecipe(undefined);
+          }}
+        />
+      )}
+
+      {/* Immersive Walkthrough Overlay for Step-by-Step cooking walkthrough */}
+      {activeCookingRecipe && (
+        <ActiveCookingWalkthrough
+          recipe={activeCookingRecipe}
+          servings={cookingServings}
+          onClose={() => setActiveCookingRecipe(null)}
+          onFinishCooking={handleFinishCooking}
+        />
+      )}
 
     </div>
   );

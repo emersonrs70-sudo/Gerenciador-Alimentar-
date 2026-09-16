@@ -52,3 +52,16 @@ export interface ShoppingListItem {
   category: string;
   recipeTitle?: string; // Optional reference to where it came from
 }
+
+export interface CookingHistoryEntry {
+  id: string;
+  recipeId: string;
+  recipeTitle: string;
+  recipeImage: string;
+  cookedAt: string;
+  servings: number;
+  calories: number;
+  difficulty: RecipeDifficulty;
+  diet: RecipeDiet;
+}
+

@@ -97,23 +97,23 @@ export default function ChefAIPanel({ pantry, onRecipeGenerated }: ChefAIPanelPr
   };
 
   return (
-    <div class="bg-white p-6 sm:p-8 rounded-3xl border border-slate-100 shadow-sm space-y-6 max-w-3xl mx-auto">
+    <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-100 shadow-sm space-y-6 max-w-3xl mx-auto">
       
       {/* Loading state block */}
       {loading ? (
-        <div class="py-16 text-center space-y-6 flex flex-col items-center justify-center">
-          <div class="relative w-24 h-24 flex items-center justify-center">
+        <div className="py-16 text-center space-y-6 flex flex-col items-center justify-center">
+          <div className="relative w-24 h-24 flex items-center justify-center">
             {/* Spinning background circle */}
-            <div class="absolute inset-0 border-4 border-orange-100 border-t-orange-500 rounded-full animate-spin"></div>
+            <div className="absolute inset-0 border-4 border-orange-100 border-t-orange-500 rounded-full animate-spin"></div>
             {/* Pulsing inner icon */}
-            <ChefHat size={36} class="text-orange-500 animate-pulse" />
+            <ChefHat size={36} className="text-orange-500 animate-pulse" />
           </div>
 
-          <div class="space-y-2 max-w-sm">
-            <h4 class="font-serif italic font-bold text-slate-800 text-lg">
+          <div className="space-y-2 max-w-sm">
+            <h4 className="font-serif italic font-bold text-slate-800 text-lg">
               {LOADING_STEPS[loadingStepIdx]}
             </h4>
-            <p class="text-xs text-slate-400 font-light">
+            <p className="text-xs text-slate-400 font-light">
               Isso pode levar alguns segundos. O Chef IA está construindo a receita perfeita sob medida para você...
             </p>
           </div>
@@ -121,49 +121,49 @@ export default function ChefAIPanel({ pantry, onRecipeGenerated }: ChefAIPanelPr
       ) : (
         <>
           {/* Default generation panel interface */}
-          <div class="flex items-start gap-4 pb-4 border-b border-slate-100">
-            <div class="p-3 bg-purple-100 text-purple-600 rounded-2xl">
-              <Sparkles size={24} class="animate-pulse text-purple-600" />
+          <div className="flex items-start gap-4 pb-4 border-b border-slate-100">
+            <div className="p-3 bg-purple-100 text-purple-600 rounded-2xl">
+              <Sparkles size={24} className="animate-pulse text-purple-600" />
             </div>
             <div>
-              <h3 class="text-xl font-serif italic font-bold text-slate-800">
+              <h3 className="text-xl font-serif italic font-bold text-slate-800">
                 Chef IA: Criador de Receitas Personalizadas
               </h3>
-              <p class="text-xs text-slate-400 mt-1">
+              <p className="text-xs text-slate-400 mt-1">
                 Gere receitas exclusivas baseadas exatamente no estoque que você possui na despensa agora!
               </p>
             </div>
           </div>
 
           {errorMsg && (
-            <div class="p-4 bg-rose-50 border border-rose-200 text-rose-700 rounded-2xl text-xs flex items-start gap-2 leading-relaxed">
-              <AlertTriangle size={16} class="shrink-0 text-rose-600 mt-0.5" />
+            <div className="p-4 bg-rose-50 border border-rose-200 text-rose-700 rounded-2xl text-xs flex items-start gap-2 leading-relaxed">
+              <AlertTriangle size={16} className="shrink-0 text-rose-600 mt-0.5" />
               <div>
-                <p class="font-semibold">Erro ao gerar receita</p>
-                <p class="text-slate-500 mt-0.5">{errorMsg}</p>
+                <p className="font-semibold">Erro ao gerar receita</p>
+                <p className="text-slate-500 mt-0.5">{errorMsg}</p>
               </div>
             </div>
           )}
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             
             {/* Left side: ingredient selector */}
-            <div class="space-y-3">
-              <div class="flex justify-between items-center">
-                <label class="block text-xs font-bold font-display uppercase tracking-wider text-slate-400">
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <label className="block text-xs font-bold font-display uppercase tracking-wider text-slate-400">
                   Selecionar Ingredientes Disponíveis
                 </label>
-                <span class="text-[11px] text-purple-600 font-medium">
+                <span className="text-[11px] text-purple-600 font-medium">
                   {selectedIngredientIds.length} selecionado(s)
                 </span>
               </div>
 
               {pantry.length === 0 ? (
-                <div class="text-center py-8 border border-dashed border-slate-200 rounded-2xl text-slate-400 text-xs">
+                <div className="text-center py-8 border border-dashed border-slate-200 rounded-2xl text-slate-400 text-xs">
                   Sua despensa está vazia. Adicione itens antes para usá-los aqui!
                 </div>
               ) : (
-                <div class="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto pr-2 pb-1">
+                <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto pr-2 pb-1">
                   {pantry.map(item => {
                     const isSelected = selectedIngredientIds.includes(item.id);
                     const isOutOfStock = item.quantity === 0;
@@ -174,7 +174,7 @@ export default function ChefAIPanel({ pantry, onRecipeGenerated }: ChefAIPanelPr
                         type="button"
                         onClick={() => handleToggleIngredient(item.id)}
                         disabled={isOutOfStock}
-                        class={`p-2.5 rounded-xl border text-left text-xs font-medium transition-all flex items-center justify-between ${
+                        className={`p-2.5 rounded-xl border text-left text-xs font-medium transition-all flex items-center justify-between ${
                           isSelected
                             ? 'border-purple-300 bg-purple-50/50 text-purple-900'
                             : isOutOfStock
@@ -182,11 +182,11 @@ export default function ChefAIPanel({ pantry, onRecipeGenerated }: ChefAIPanelPr
                             : 'border-slate-200 hover:border-slate-300 text-slate-700'
                         }`}
                       >
-                        <span class="truncate pr-1">{item.name}</span>
+                        <span className="truncate pr-1">{item.name}</span>
                         {isSelected ? (
-                          <Check size={12} class="text-purple-600 shrink-0" />
+                          <Check size={12} className="text-purple-600 shrink-0" />
                         ) : (
-                          <span class="text-[10px] text-slate-400 shrink-0 font-normal">
+                          <span className="text-[10px] text-slate-400 shrink-0 font-normal">
                             {item.quantity} {item.unit}
                           </span>
                         )}
@@ -198,18 +198,18 @@ export default function ChefAIPanel({ pantry, onRecipeGenerated }: ChefAIPanelPr
             </div>
 
             {/* Right side: diet and filters */}
-            <div class="space-y-5">
+            <div className="space-y-5">
               <div>
-                <label class="block text-xs font-bold font-display uppercase tracking-wider text-slate-400 mb-2">
+                <label className="block text-xs font-bold font-display uppercase tracking-wider text-slate-400 mb-2">
                   Tipo de Dieta
                 </label>
-                <div class="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-3 gap-2">
                   {(['Fit', 'Fim de Semana', 'Calórica'] as RecipeDiet[]).map(d => (
                     <button
                       key={d}
                       type="button"
                       onClick={() => setDiet(d)}
-                      class={`py-2 rounded-xl border text-xs font-semibold text-center transition-all ${
+                      className={`py-2 rounded-xl border text-xs font-semibold text-center transition-all ${
                         diet === d
                           ? 'border-purple-500 bg-purple-50 text-purple-700'
                           : 'border-slate-200 hover:border-slate-300 text-slate-600'
@@ -222,16 +222,16 @@ export default function ChefAIPanel({ pantry, onRecipeGenerated }: ChefAIPanelPr
               </div>
 
               <div>
-                <label class="block text-xs font-bold font-display uppercase tracking-wider text-slate-400 mb-2">
+                <label className="block text-xs font-bold font-display uppercase tracking-wider text-slate-400 mb-2">
                   Nível de Dificuldade
                 </label>
-                <div class="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-3 gap-2">
                   {(['Fácil', 'Médio', 'Difícil'] as RecipeDifficulty[]).map(dif => (
                     <button
                       key={dif}
                       type="button"
                       onClick={() => setDifficulty(dif)}
-                      class={`py-2 rounded-xl border text-xs font-semibold text-center transition-all ${
+                      className={`py-2 rounded-xl border text-xs font-semibold text-center transition-all ${
                         difficulty === dif
                           ? 'border-purple-500 bg-purple-50 text-purple-700'
                           : 'border-slate-200 hover:border-slate-300 text-slate-600'
@@ -244,16 +244,16 @@ export default function ChefAIPanel({ pantry, onRecipeGenerated }: ChefAIPanelPr
               </div>
 
               <div>
-                <label class="block text-xs font-bold font-display uppercase tracking-wider text-slate-400 mb-2">
+                <label className="block text-xs font-bold font-display uppercase tracking-wider text-slate-400 mb-2">
                   Ocasião
                 </label>
-                <div class="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-2">
                   {(['Dia a Dia', 'Domingo'] as RecipeCategory[]).map(catItem => (
                     <button
                       key={catItem}
                       type="button"
                       onClick={() => setCategory(catItem)}
-                      class={`py-2 rounded-xl border text-xs font-semibold text-center transition-all ${
+                      className={`py-2 rounded-xl border text-xs font-semibold text-center transition-all ${
                         category === catItem
                           ? 'border-purple-500 bg-purple-50 text-purple-700'
                           : 'border-slate-200 hover:border-slate-300 text-slate-600'
@@ -272,9 +272,9 @@ export default function ChefAIPanel({ pantry, onRecipeGenerated }: ChefAIPanelPr
             type="button"
             onClick={handleGenerate}
             disabled={selectedIngredientIds.length === 0}
-            class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 disabled:from-slate-200 disabled:to-slate-200 text-white font-semibold py-3.5 rounded-2xl transition-all shadow-md shadow-purple-500/10 flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed"
+            className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 disabled:from-slate-200 disabled:to-slate-200 text-white font-semibold py-3.5 rounded-2xl transition-all shadow-md shadow-purple-500/10 flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed"
           >
-            <Sparkles size={18} class="text-yellow-300 shrink-0" />
+            <Sparkles size={18} className="text-yellow-300 shrink-0" />
             <span>Gerar Receita Exclusiva com Chef IA ✦</span>
           </button>
         </>
